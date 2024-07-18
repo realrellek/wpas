@@ -4,7 +4,7 @@ wpas is a companion to [wp-cli](https://github.com/wp-cli/wp-cli). It allows you
 ## Usage
 Usage:
 ```shell
-$ wpas <username> <...parameters>
+wpas <username> <...parameters>
 ```
 Using `wpas` is easy. The command is `wpas` and it needs at least 2 arguments. The first is the user and the rest is what gets passed to `wp`. So everything after the `wpas <username>` part is the same as it would be with the `wp` command.
 
@@ -13,17 +13,17 @@ This script only works if you are root. If not, use `wp` directly.
 ## Installation
 Grab the script.
 ```shell
-# curl -O https://github.com/realrellek/wpas/raw/main/wpas.sh
+curl -O https://github.com/realrellek/wpas/raw/main/wpas.sh
 ```
 
 Make it executeable.
 ```shell
-# chmod +x ./wpas.sh
+chmod +x ./wpas.sh
 ```
 
 Move it to a convenient location (i.e. to where `wp` is too)
 ```shell
-# mv ./wpas.sh /usr/local/bin/wpas
+mv ./wpas.sh /usr/local/bin/wpas
 ```
 
 Here's the copy-paste friendly version:
