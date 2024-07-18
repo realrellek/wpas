@@ -13,7 +13,7 @@ This script only works if you are root. If not, use `wp` directly.
 ## Installation
 Grab the script.
 ```shell
-# wget fixme
+# curl -O https://github.com/realrellek/wpas/raw/main/wpas.sh
 ```
 
 Make it executeable.
@@ -28,7 +28,7 @@ Move it to a convenient location (i.e. to where `wp` is too)
 
 Here's the copy-paste friendly version:
 ```shell
-wget fixme
+curl -O https://github.com/realrellek/wpas/raw/main/wpas.sh
 chmod +x ./wpas.sh
 mv ./wpas.sh /usr/local/bin/wpas
 ```
