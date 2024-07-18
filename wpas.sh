@@ -54,7 +54,7 @@ if command sudo -v &> /dev/null; then
   sudo -u $RUNASUSER -- $WPCOMMAND $COMMANDLINE
 # do we have a runuser (Linux only)?
 elif command runuser --v &> /dev/null; then
-  runuser -u $RUNASUSER $WPCOMMAND $COMMANDLINE
+  runuser -u $RUNASUSER -- $WPCOMMAND $COMMANDLINE
 # if not, we go the su route which is POSIX and should therefore be there
 else
   su $RUNASUSER -s /bin/sh -c "$WPCOMMAND $COMMANDLINE"
