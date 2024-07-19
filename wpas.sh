@@ -1,13 +1,5 @@
 #/bin/sh
 
-# We need at least 2 parameters, the username under which wp is meant to run
-# and the command line of wp.
-if [ "$#" -lt 2 ]; then
-  echo "Usage:"
-  echo "  wpas <username> <...parameters>"
-  exit
-fi;
-
 # Let's see if wp is even installed (as per documentation).
 if command wp --info &> /dev/null; then
   WPCOMMAND="wp"
@@ -23,6 +15,14 @@ else
   exit 1
 fi;
 
+# We need at least 2 parameters, the username under which wp is meant to run
+# and the command line of wp.
+if [ "$#" -lt 2 ]; then
+  echo "Usage:"
+  echo "  wpas <username> <...parameters>"
+  exit
+fi;
+
 # desired user is the first parameter
 RUNASUSER=$1
 
@@ -33,7 +33,7 @@ shift
 COMMANDLINE=$@
 
 # If you are not root, you probably don't even have permission to run sudo
-# And also probably no need to run wpas.
+# And also likely no need to run wpas.
 if [ `id -u` -ne 0 ]; then
   echo "You are not root. You probably want to run wp directly."
   echo ""
