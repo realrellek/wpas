@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 
 # Let's see if wp is even installed (as per documentation).
 if command wp --info &> /dev/null; then
