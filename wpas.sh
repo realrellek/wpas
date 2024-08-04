@@ -1,13 +1,13 @@
 #!/bin/sh
 
 # Let's see if wp is even installed (as per documentation).
-if command wp --info &> /dev/null; then
+if command -v wp > /dev/null; then
   WPCOMMAND="wp"
 # or maybe it's "wp-cli"?
-elif command wp-cli --info &> /dev/null; then
+elif command -v wp-cli > /dev/null; then
   WPCOMMAND="wp-cli"
 # or maybe it's "wp-cli.phar"?
-elif command wp-cli.phar --info &> /dev/null; then
+elif command -v wp-cli.phar > /dev/null; then
   WPCOMMAND="wp-cli.phar"
 # Guess it's not installed <shrug emote>
 else
@@ -20,7 +20,7 @@ fi;
 if [ "$#" -lt 2 ]; then
   echo "Usage:"
   echo "  wpas <username> <...parameters>"
-  exit
+  exit 2
 fi;
 
 # desired user is the first parameter
@@ -38,26 +38,31 @@ if [ `id -u` -ne 0 ]; then
   echo "You are not root. You probably want to run wp directly."
   echo ""
   echo "  $WPCOMMAND $COMMANDLINE"
-  exit 2
+  exit 3
 fi;
 
 # Let us see if the user even exists
 if [ ! $(id -u "$RUNASUSER" 2> /dev/null) ]; then
   echo "User $RUNASUSER does not exist"
-  exit 3
+  exit 4
 fi;
 
 # build and execute the actual command
 #
 # do we have a sudo?
-if command sudo -v &> /dev/null; then
+command -v sudo > /dev/null
+if [ $? -eq "0" ]; then
   sudo -u $RUNASUSER -- $WPCOMMAND $COMMANDLINE
 # do we have a runuser (Linux only)?
-elif command runuser --v &> /dev/null; then
-  runuser -u $RUNASUSER -- $WPCOMMAND $COMMANDLINE
-# if not, we go the su route which is POSIX and should therefore be there
 else
-  su $RUNASUSER -s /bin/sh -c "$WPCOMMAND $COMMANDLINE"
+  # do we have a runuser (Linux only)?
+  command -v runuser > /dev/null
+  if [ $? -eq 0 ]; then
+    runuser -u $RUNASUSER -- $WPCOMMAND $COMMANDLINE
+  else
+    # if not, we go the su route which is POSIX and should therefore be there
+    su $RUNASUSER -s /bin/sh -c "$WPCOMMAND $COMMANDLINE"
+  fi;
 fi;
 
 exit $?
