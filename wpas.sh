@@ -50,19 +50,14 @@ fi;
 # build and execute the actual command
 #
 # do we have a sudo?
-command -v sudo > /dev/null
-if [ $? -eq "0" ]; then
+if command -v sudo > /dev/null; then
   sudo -u $RUNASUSER -- $WPCOMMAND $COMMANDLINE
 # do we have a runuser (Linux only)?
+elif command -v runuser > /dev/null; then
+  runuser -u $RUNASUSER -- $WPCOMMAND $COMMANDLINE
 else
-  # do we have a runuser (Linux only)?
-  command -v runuser > /dev/null
-  if [ $? -eq 0 ]; then
-    runuser -u $RUNASUSER -- $WPCOMMAND $COMMANDLINE
-  else
-    # if not, we go the su route which is POSIX and should therefore be there
-    su $RUNASUSER -s /bin/sh -c "$WPCOMMAND $COMMANDLINE"
-  fi;
+# if not, we go the su route which is POSIX and should therefore be there
+  su $RUNASUSER -s /bin/sh -c "$WPCOMMAND $COMMANDLINE"
 fi;
 
 exit $?
