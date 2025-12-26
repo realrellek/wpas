@@ -1,46 +1,117 @@
 # wpas
-wpas is a companion to [wp-cli](https://github.com/wp-cli/wp-cli). It allows you to run the wp command under another user, in case you are root and that is the only (convenient) user on your host.
+
+wpas is a thin wrapper around [wp-cli](https://github.com/wp-cli/wp-cli).
+
+It allows you to run the `wp` command as the **site owner user** while staying
+logged in as **root**.
+
+It exists to solve one specific problem:
+
+> Running wp-cli as root creates root-owned files and breaks permissions.
+
+---
+
+## Why does this exist?
+
+On many servers, the only “real” login user is `root`.
+Other users (php-fpm pools, `www-data`, hosting panel users, etc.)
+either don’t have login shells or are inconvenient to switch to.
+
+Running `wp` as root is discouraged — and for good reason.
+Even with `--allow-root`, wp-cli may create files owned by root
+(caches, generated assets, uploads, plugin updates),
+which later causes subtle and annoying permission issues.
+
+What you *actually* want is:
+- log in as root (for system administration),
+- but run wp-cli as the **user that owns the WordPress files**.
+
+`wpas` does exactly that — nothing more, nothing less.
+
+---
+
+## What wpas is (and is not)
+
+- wpas does **not** replace wp-cli
+- wpas does **not** add features
+- wpas does **not** change wp-cli semantics
+- wpas does **not** try to be clever
+
+It only changes **who runs `wp`**, not **what `wp` does**.
+
+If you know wp-cli, you already know wpas.
+
+---
 
 ## Usage
-Usage:
-```shell
-wpas <username> <...parameters>
-```
-Using `wpas` is easy. The command is `wpas` and it needs at least 2 arguments. The first is the user and the rest is what gets passed to `wp`. So everything after the `wpas <username>` part is the same as it would be with the `wp` command.
 
-This script only works if you are root. If not, use `wp` directly.
+```shell
+wpas <username> <...wp parameters>
+````
+
+The first argument is the user to run `wp` as.
+Everything after that is passed to `wp` unchanged.
+
+Example:
+
+```shell
+# wp-cli tutorial command
+wp plugin update --all
+
+# same command using wpas
+wpas wum plugin update --all
+```
+
+This script only works if you are root.
+If you are not root, just use `wp` directly.
+
+---
+
+## Why not just use --allow-root?
+
+Because it only silences the warning — it does not fix the problem.
+
+Running wp-cli as root still creates root-owned files.
+Cleaning up permissions afterwards is error-prone and easy to forget.
+
+`wpas` avoids this entirely by running wp-cli as the correct user in the first place.
+
+---
 
 ## Installation
-Grab the script.
+
+Download the script:
+
 ```shell
 curl -O https://raw.githubusercontent.com/realrellek/wpas/main/wpas.sh
 ```
 
-Make it executable.
+Make it executable:
+
 ```shell
 chmod +x ./wpas.sh
 ```
 
-Move it to a convenient location (i.e., to where `wp` is too)
+Move it somewhere in your `$PATH` (for example, next to `wp`):
+
 ```shell
 mv ./wpas.sh /usr/local/bin/wpas
 ```
 
-Here's the copy-paste friendly version:
+Copy-paste friendly version:
+
 ```shell
 curl -O https://raw.githubusercontent.com/realrellek/wpas/main/wpas.sh
 chmod +x ./wpas.sh
 mv ./wpas.sh /usr/local/bin/wpas
 ```
 
-## Why is this?
-So maybe you administrate a server and your only “real” user is root. There may or may not be other users, e.g., for `php-fpm` or at least `www-data`. But those may not have a login shell, in which case things can get a little interesting.
+---
 
-`wp` does not (really) want you to run it as root, and for good reason. It could mess up file permissions if you update a plugin or regenerate thumbnails. So don't do it.
+## Requirements
 
-What you would want to do instead is to run `wp` as the user the web server would run under too. But this can be a pain to remember the commands. With `wpas`, you don't have to remember.
+* wp-cli must be installed and working
+* you must be root (wpas switches users internally)
+* a Unix-like system with `sudo`, `runuser`, or `su`
 
-## System requirements
-Obviously, you need `wp` to work as intended.
-
-Otherwise, you should be fine with a *nix machine running your stuff. `wpas` favors `sudo` but can fall back to `runuser` (which is Linux-only) and even `su`.
+`wpas` prefers `sudo`, but can fall back to `runuser` (Linux-only) or `su`.
